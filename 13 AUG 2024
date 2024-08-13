@@ -1,0 +1,108 @@
+1) MYSQL:
+SELECT 
+    m1.firstname AS mem_fname,
+    m1.surname AS mem_sname,
+    m2.firstname AS rec_fname,
+    m2.surname AS rec_sname
+FROM 
+    members m1
+LEFT JOIN 
+    members m2 ON m1.recommendedby = m2.memid
+ORDER BY 
+    mem_fname ASC, mem_sname ASC;
+
+
+2) AVL Balance Tree
+class TreeNode:
+    def __init__(self, key):
+        self.key = key
+        self.left = None
+        self.right = None
+        self.height = 1
+
+class AVLTree:
+    def insert(self, root, key):
+        if not root:
+            return TreeNode(key)
+        elif key < root.key:
+            root.left = self.insert(root.left, key)
+        else:
+            root.right = self.insert(root.right, key)
+        
+        root.height = 1 + max(self.getHeight(root.left), self.getHeight(root.right))
+        
+        balance = self.getBalance(root)
+        
+        if balance > 1 and key < root.left.key:
+            return self.rightRotate(root)
+        
+        if balance < -1 and key > root.right.key:
+            return self.leftRotate(root)
+        
+        if balance > 1 and key > root.left.key:
+            root.left = self.leftRotate(root.left)
+            return self.rightRotate(root)
+        
+        if balance < -1 and key < root.right.key:
+            root.right = self.rightRotate(root.right)
+            return self.leftRotate(root)
+        
+        return root
+    
+    def leftRotate(self, z):
+        y = z.right
+        T2 = y.left
+        
+        y.left = z
+        z.right = T2
+        
+        z.height = 1 + max(self.getHeight(z.left), self.getHeight(z.right))
+        y.height = 1 + max(self.getHeight(y.left), self.getHeight(y.right))
+        
+        return y
+    
+    def rightRotate(self, z):
+        y = z.left
+        T3 = y.right
+        
+        y.right = z
+        z.left = T3
+        
+        z.height = 1 + max(self.getHeight(z.left), self.getHeight(z.right))
+        y.height = 1 + max(self.getHeight(y.left), self.getHeight(y.right))
+        
+        return y
+    
+    def getHeight(self, root):
+        if not root:
+            return 0
+        return root.height
+    
+    def getBalance(self, root):
+        if not root:
+            return 0
+        return self.getHeight(root.left) - self.getHeight(root.right)
+    
+    def preOrder(self, root):
+        res = []
+        if root:
+            res.append(root.key)
+            res = res + self.preOrder(root.left)
+            res = res + self.preOrder(root.right)
+        return res
+
+def constructAVLTree(keys):
+    avl = AVLTree()
+    root = None
+    for key in keys:
+        root = avl.insert(root, key)
+    return root
+
+import sys
+input = sys.stdin.read().split()
+n = int(input[0])
+keys = list(map(int, input[1:n+1]))
+
+avl_tree = constructAVLTree(keys)
+result = AVLTree().preOrder(avl_tree)
+print(" ".join(map(str, result)))
